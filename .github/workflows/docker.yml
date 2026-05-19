@@ -19,16 +19,35 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Latest litellm version: $VERSION"
 
-      - name: Check if already published
+      - name: Determine build tag
+        id: tag
+        run: |
+          BASE="${{ steps.litellm.outputs.version }}"
+          EXISTING=$(curl -s "https://hub.docker.com/v2/repositories/adaex/litellm-passthrough/tags?page_size=100" \
+            | jq -r '.results[].name' | grep -E "^${BASE}(-[0-9]+)?$" | sort -V | tail -1)
+          if [ -z "$EXISTING" ]; then
+            TAG="$BASE"
+          elif [ "$EXISTING" = "$BASE" ]; then
+            TAG="${BASE}-1"
+          else
+            N=$(echo "$EXISTING" | grep -oE '[0-9]+$')
+            TAG="${BASE}-$((N+1))"
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "Build tag: $TAG"
+
+      - name: Check if skip (schedule only)
         id: check
         run: |
-          TAG="adaex/litellm-passthrough:${{ steps.litellm.outputs.version }}"
-          if docker manifest inspect "$TAG" > /dev/null 2>&1; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "Manual trigger, always build"
+          elif docker manifest inspect "adaex/litellm-passthrough:${{ steps.litellm.outputs.version }}" > /dev/null 2>&1; then
             echo "skip=true" >> $GITHUB_OUTPUT
-            echo "Already published: $TAG"
+            echo "No new litellm version, skip"
           else
             echo "skip=false" >> $GITHUB_OUTPUT
-            echo "New version to publish: $TAG"
+            echo "New litellm version detected"
           fi
 
       - uses: docker/setup-buildx-action@v3
@@ -48,5 +67,5 @@ jobs:
           platforms: linux/amd64,linux/arm64
           build-args: LITELLM_VERSION=${{ steps.litellm.outputs.version }}
           tags: |
-            adaex/litellm-passthrough:${{ steps.litellm.outputs.version }}
+            adaex/litellm-passthrough:${{ steps.tag.outputs.tag }}
             adaex/litellm-passthrough:latest
