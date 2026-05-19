@@ -1,4 +1,5 @@
-FROM litellm/litellm:main-stable
+ARG LITELLM_VERSION=v1.85.0
+FROM litellm/litellm:${LITELLM_VERSION}
 
 COPY config.yaml /app/config.yaml
 COPY hooks.py /app/hooks.py
