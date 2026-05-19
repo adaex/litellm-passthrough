@@ -1,4 +1,4 @@
-ARG LITELLM_VERSION=v1.85.0
+ARG LITELLM_VERSION=main-stable
 FROM litellm/litellm:${LITELLM_VERSION}
 
 COPY config.yaml /app/config.yaml
