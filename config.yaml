@@ -13,6 +13,7 @@ general_settings:
   master_key: os.environ/LITELLM_MASTER_KEY
   disable_spend_logs: true
   disable_error_logs: true
+  allow_requests_on_db_unavailable: true
 
 litellm_settings:
   drop_params: true
@@ -20,5 +21,5 @@ litellm_settings:
   request_timeout: 600
   num_retries: 0
   set_verbose: false
-  json_logs: false
+  json_logs: true
   callbacks: hooks.dynamic_upstream_hook
