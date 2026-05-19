@@ -6,5 +6,7 @@ COPY hooks.py /app/hooks.py
 
 ENV LITELLM_MASTER_KEY=sk-litellm-passthrough
 ENV LITELLM_LOCAL_MODEL_COST_MAP=true
+ENV HOST=0.0.0.0
+ENV PORT=4000
 
-CMD ["--config", "/app/config.yaml", "--host", "0.0.0.0", "--port", "4000"]
+CMD ["sh", "-c", "exec litellm --config /app/config.yaml --host $HOST --port $PORT"]
