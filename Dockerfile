@@ -7,5 +7,6 @@ COPY run.sh /app/run.sh
 
 ENV LITELLM_MASTER_KEY=sk-litellm-passthrough
 ENV LITELLM_LOCAL_MODEL_COST_MAP=true
+ENV DISABLE_SCHEMA_UPDATE=true
 
 ENTRYPOINT ["/app/run.sh"]

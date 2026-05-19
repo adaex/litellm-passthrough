@@ -44,7 +44,7 @@ curl http://localhost:4000/v1/chat/completions \
 |----------|---------|-------------|
 | `LITELLM_MASTER_KEY` | `sk-litellm-passthrough` | Proxy authentication key |
 | `PORT` | `4000` | Listen port |
-| `HOST` | `0.0.0.0` | Listen address |
+| `HOST` | `::` | Listen address (dual-stack IPv4+IPv6) |
 
 ## How It Works
 
