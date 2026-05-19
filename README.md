@@ -43,7 +43,7 @@ curl http://localhost:4000/v1/chat/completions \
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `LITELLM_MASTER_KEY` | `sk-litellm-passthrough` | Proxy authentication key |
-| `PORT` | `4000` | Listen port |
+| `PORT` | `4000` | Listen port (FaaS uses `_BYTEFAAS_RUNTIME_PORT`) |
 | `HOST` | `::` | Listen address (dual-stack IPv4+IPv6) |
 
 ## How It Works
