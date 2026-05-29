@@ -13,6 +13,8 @@ COPY hooks.py /app/hooks.py
 COPY run.sh /app/run.sh
 RUN chmod +x /app/run.sh
 
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
 ENV LITELLM_MASTER_KEY=sk-litellm-passthrough
 ENV LITELLM_LOCAL_MODEL_COST_MAP=true
 ENV LITELLM_MODE=PRODUCTION
