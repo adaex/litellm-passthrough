@@ -24,7 +24,9 @@ ENV NO_OPENAPI=True
 ENV DISABLE_ADMIN_UI=True
 
 # Pre-compile bytecode at build time so first import doesn't pay the .py → .pyc cost.
-RUN python -m compileall -q -j 0 /usr/local/lib/python3.13/site-packages /app 2>/dev/null || true
+# Resolve site-packages via sysconfig so this stays correct across python/base-image bumps.
+RUN SITE=$(python -c 'import sysconfig;print(sysconfig.get_paths()["purelib"])') && \
+    python -m compileall -q -j 0 "$SITE" /app 2>/dev/null || true
 
 WORKDIR /app
 ENTRYPOINT ["/app/run.sh"]
