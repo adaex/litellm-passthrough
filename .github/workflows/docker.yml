@@ -11,11 +11,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get latest litellm stable version
+      - name: Get latest litellm version from PyPI
         id: litellm
         run: |
-          VERSION=$(curl -s "https://hub.docker.com/v2/repositories/litellm/litellm/tags?page_size=50&ordering=last_updated" \
-            | jq -r '.results[].name' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | head -1)
+          VERSION=$(curl -s "https://pypi.org/pypi/litellm/json" | jq -r '.info.version')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Latest litellm version: $VERSION"
 

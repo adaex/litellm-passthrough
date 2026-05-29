@@ -14,6 +14,8 @@ general_settings:
   disable_spend_logs: true
   disable_error_logs: true
   allow_requests_on_db_unavailable: true
+  store_model_in_db: false
+  background_health_checks: false
 
 litellm_settings:
   drop_params: true
@@ -22,4 +24,5 @@ litellm_settings:
   num_retries: 0
   set_verbose: false
   json_logs: true
+  telemetry: false
   callbacks: hooks.dynamic_upstream_hook

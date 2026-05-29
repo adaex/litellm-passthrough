@@ -42,9 +42,21 @@ curl http://localhost:4000/v1/chat/completions \
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LITELLM_MASTER_KEY` | `sk-litellm-passthrough` | Proxy authentication key |
-| `PORT` | `4000` | Listen port (FaaS uses `_BYTEFAAS_RUNTIME_PORT`) |
-| `HOST` | `::` | Listen address (dual-stack IPv4+IPv6) |
+| `LITELLM_MASTER_KEY` | `sk-litellm-passthrough` | Proxy authentication key. **Override this in production.** |
+| `PORT` | `4000` | Listen port |
+| `HOST` | `0.0.0.0` | Listen address. See **Listen address** below for IPv4 / IPv6 / dual-stack. |
+
+> **Security note:** the default `LITELLM_MASTER_KEY` is baked into the public image. Anyone who can reach the proxy can use it to send requests through your egress (no upstream credentials are stored, but traffic and logs still cost you). For any production deployment, override `LITELLM_MASTER_KEY` and/or restrict network access.
+
+## Listen address
+
+The proxy is a single uvicorn process and binds **one socket**. Pick `HOST` based on what protocol your clients / load balancer / health probe use:
+
+| Want | `HOST` | Notes |
+|------|--------|-------|
+| IPv4 only (recommended default) | `0.0.0.0` | Works everywhere, including FaaS / runtimes where IPv6 is disabled inside the container. |
+| IPv6 only | a specific v6 address, e.g. `::1` | The container's netns must have IPv6 enabled. |
+| Dual-stack (v4 + v6 on one socket) | `::` | Relies on the kernel's IPv4-mapped-IPv6 behavior. **Requires `/proc/sys/net/ipv6/conf/all/disable_ipv6 = 0` and `bindv6only = 0` inside the container.** Many container runtimes (some FaaS platforms, dockerd configs) ship with IPv6 disabled in the container netns — there `::` will appear to bind successfully but reject incoming v4 traffic, breaking health probes. If unsure, stick with `0.0.0.0`. |
 
 ## How It Works
 

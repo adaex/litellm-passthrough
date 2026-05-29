@@ -1,4 +1,5 @@
 from typing import Optional, Union
+from fastapi import HTTPException
 from litellm.integrations.custom_logger import CustomLogger
 
 
@@ -31,15 +32,26 @@ class DynamicUpstreamHook(CustomLogger):
         upstream_models = headers_lc.get("x-upstream-models")
         upstream_model = headers_lc.get("x-upstream-model")
 
-        if upstream_url:
-            data["api_base"] = upstream_url
-
-        if upstream_auth:
-            data["api_key"] = (
-                upstream_auth[len("Bearer "):]
-                if upstream_auth.lower().startswith("bearer ")
-                else upstream_auth
+        missing = [
+            name
+            for name, value in (
+                ("X-Upstream-Url", upstream_url),
+                ("X-Upstream-Authorization", upstream_auth),
             )
+            if not value
+        ]
+        if missing:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Missing required header(s): {', '.join(missing)}",
+            )
+
+        data["api_base"] = upstream_url
+        data["api_key"] = (
+            upstream_auth[len("Bearer "):]
+            if upstream_auth.lower().startswith("bearer ")
+            else upstream_auth
+        )
 
         if upstream_models:
             mapped = _parse_models_map(upstream_models).get(data.get("model"))
