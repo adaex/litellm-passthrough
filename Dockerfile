@@ -1,10 +1,10 @@
 FROM python:3.13-slim
 
-ARG LITELLM_VERSION=1.85.0
+ARG LITELLM_VERSION=1.86.2
 
 # uv installs ~10x faster than pip and avoids pip's dependency-resolver memory blowups.
-# We install only `litellm[proxy]` — NOT `litellm[extra-proxy]` — so prisma is not pulled in.
-# Skipping prisma alone saves ~10s of startup (prisma.types is a huge generated types module).
+# litellm[proxy] >=1.86 no longer pulls in prisma — that alone is ~10s of startup
+# and ~500MB of image we don't need (we run zero-state, no DB).
 RUN pip install --no-cache-dir uv && \
     uv pip install --system --no-cache "litellm[proxy]==${LITELLM_VERSION}"
 
@@ -19,11 +19,10 @@ ENV LITELLM_MASTER_KEY=sk-litellm-passthrough
 ENV LITELLM_LOCAL_MODEL_COST_MAP=true
 ENV LITELLM_MODE=PRODUCTION
 ENV LITELLM_LOG=WARNING
-ENV DISABLE_SCHEMA_UPDATE=true
-ENV NO_DOCS=True
-ENV NO_REDOC=True
-ENV NO_OPENAPI=True
-ENV DISABLE_ADMIN_UI=True
+ENV NO_DOCS=true
+ENV NO_REDOC=true
+ENV NO_OPENAPI=true
+ENV DISABLE_ADMIN_UI=true
 
 # Pre-compile bytecode at build time so first import doesn't pay the .py → .pyc cost.
 # Resolve site-packages via sysconfig so this stays correct across python/base-image bumps.
