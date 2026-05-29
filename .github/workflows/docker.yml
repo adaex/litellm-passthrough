@@ -68,7 +68,7 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           build-args: LITELLM_VERSION=${{ steps.litellm.outputs.version }}
           tags: |
             adaex/litellm-passthrough:${{ steps.tag.outputs.tag }}
